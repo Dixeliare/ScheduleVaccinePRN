@@ -1,100 +1,161 @@
 ﻿@page
 @model ScheduleVaccineRazor.Pages.Home.ScheduleIndexModel
-
 @{
-    ViewData["Title"] = "Lịch hẹn tiêm vaccine";
+    ViewData["Title"] = "Vaccination Schedule Management";
 }
 
-<h1>Lịch hẹn tiêm vaccine</h1>
+<div class="container">
+    <!-- Header Section -->
+    <div class="d-flex justify-content-between align-items-center mb-5">
+        <h1 class="display-6 fw-bold text-primary">
+            <i class="bi bi-calendar2-plus me-2"></i>Vaccination Schedule
+        </h1>
+        <a asp-page="/Home/SchedulePayment" class="btn btn-success">
+            <i class="bi bi-credit-card me-2"></i>Payment
+        </a>
+    </div>
 
-<!-- Form tạo lịch hẹn -->
-<form method="post">
-    <div class="form-group">
-        <label for="appointmentDate">Chọn ngày hẹn:</label>
-        <input type="text" id="appointmentDate" name="AppointmentDate" class="form-control" required />
-    </div>
-    <div class="form-group">
-        <label for="childId">Chọn trẻ:</label>
-        <select id="childId" name="ChildId" class="form-control" required>
-            @if (Model.ChildrenProfiles != null)
-            {
-                @foreach (var child in Model.ChildrenProfiles)
-                {
-                    <option value="@child.Id">@child.FullName</option>
-                }
-            }
-        </select>
-    </div>
-    <div class="form-group">
-        <label for="vaccineId">Chọn vaccine:</label>
-        <select id="vaccineId" name="VaccineId" class="form-control" required>
-            @if (Model.Vaccines != null)
-            {
-                @foreach (var vaccine in Model.Vaccines)
-                {
-                    <option value="@vaccine.Id">@vaccine.Name</option>
-                }
-            }
-        </select>
-    </div>
-    <button type="submit" class="btn btn-success mt-2">Đặt lịch</button>
-</form>
+    <!-- Create Schedule Card -->
+    <div class="card shadow-lg mb-5">
+        <div class="card-header bg-primary text-white">
+            <h5 class="card-title mb-0">
+                <i class="bi bi-plus-circle me-2"></i>Create New Appointment
+            </h5>
+        </div>
+        <div class="card-body">
+            <form method="post" class="row g-4">
+                <div class="col-md-4">
+                    <label class="form-label">
+                        <i class="bi bi-calendar-date me-2"></i>Appointment Date
+                    </label>
+                    <input type="text" id="appointmentDate" name="AppointmentDate"
+                           class="form-control flatpickr" required>
+                </div>
 
-<!-- Ô nhập để lọc lịch theo ngày -->
-<div class="form-group mt-4">
-    <label for="datepicker">Lọc lịch theo ngày:</label>
-    <input type="text" id="datepicker" class="form-control" placeholder="Chọn ngày" />
+                <div class="col-md-4">
+                    <label class="form-label">
+                        <i class="bi bi-person me-2"></i>Select Child
+                    </label>
+                    <select id="childId" name="ChildId" class="form-select" required>
+                        @if (Model.ChildrenProfiles != null)
+                        {
+                            @foreach (var child in Model.ChildrenProfiles)
+                            {
+                                <option value="@child.Id">@child.FullName</option>
+                            }
+                        }
+                    </select>
+                </div>
+
+                <div class="col-md-4">
+                    <label class="form-label">
+                        <i class="bi bi-syringe me-2"></i>Select Vaccine
+                    </label>
+                    <select id="vaccineId" name="VaccineId" class="form-select" required>
+                        @if (Model.Vaccines != null)
+                        {
+                            @foreach (var vaccine in Model.Vaccines)
+                            {
+                                <option value="@vaccine.Id">@vaccine.Name</option>
+                            }
+                        }
+                    </select>
+                </div>
+
+                <div class="col-12 text-end">
+                    <button type="submit" class="btn btn-primary px-4">
+                        <i class="bi bi-save me-2"></i>Save Appointment
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Filter Section -->
+    <div class="card shadow-sm mb-4">
+        <div class="card-body">
+            <div class="row g-3 align-items-center">
+                <div class="col-md-4">
+                    <label class="form-label">
+                        <i class="bi bi-funnel me-2"></i>Filter by Date
+                    </label>
+                    <input type="text" id="datepicker"
+                           class="form-control flatpickr"
+                           placeholder="Select date to filter">
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Schedule Table -->
+    <div class="card shadow">
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-hover mb-0">
+                    <thead class="table-light">
+                        <tr>
+                            <th><i class="bi bi-calendar2 me-2"></i>Appointment Date</th>
+                            <th><i class="bi bi-info-circle me-2"></i>Status</th>
+                            <th><i class="bi bi-person me-2"></i>Child</th>
+                            <th><i class="bi bi-syringe me-2"></i>Vaccine</th>
+                        </tr>
+                    </thead>
+                    <tbody id="scheduleTable" class="align-middle">
+                        @if (Model.Schedule != null)
+                        {
+                            @foreach (var item in Model.Schedule)
+                            {
+                                <tr data-date="@item.AppointmentDate.ToString("yyyy-MM-dd")">
+                                    <td>@item.AppointmentDate.ToString("MM/dd/yyyy")</td>
+                                    <td>
+                                        <span class="badge @GetStatusBadgeClass(item.Status)">
+                                            @item.Status
+                                        </span>
+                                    </td>
+                                    <td>@item.Child.FullName</td>
+                                    <td>@item.Vaccine.Name</td>
+                                </tr>
+                            }
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
 </div>
 
-<!-- Bảng danh sách lịch hẹn -->
-<table class="table mt-3">
-    <thead>
-        <tr>
-            <th>Ngày hẹn</th>
-            <th>Trạng thái</th>
-            <th>Trẻ</th>
-            <th>Vaccine</th>
-        </tr>
-    </thead>
-    <tbody id="scheduleTable">
-        @if (Model.Schedule != null)
+<!-- Styles -->
+<style>
+    .flatpickr-input {
+        padding: 0.5rem 1rem;
+        border-radius: 0.375rem;
+    }
+
+    .table-hover tbody tr:hover {
+        background-color: #f8f9fa;
+        cursor: pointer;
+    }
+
+    .badge {
+        font-size: 0.9em;
+        padding: 0.5em 0.75em;
+    }
+
+    .card {
+        border-radius: 1rem;
+        border: none;
+    }
+</style>
+
+@functions {
+    string GetStatusBadgeClass(string status)
+    {
+        return status switch
         {
-            @foreach (var item in Model.Schedule)
-            {
-                <tr data-date="@item.AppointmentDate.ToString("yyyy-MM-dd")">
-                    <td>@item.AppointmentDate.ToString("yyyy-MM-dd")</td>
-                    <td>@item.Status</td>
-                    <td>@item.Child.FullName</td>
-                    <td>@item.Vaccine.Name</td>
-                </tr>
-            }
-        }
-    </tbody>
-</table>
-
-<!-- Nút thanh toán duy nhất -->
-@if (Model.Schedule != null && Model.Schedule.Any(s => s.Status != "Paid"))
-{
-    <div class="text-center mt-4">
-        <a asp-page="/Home/SchedulePayment" class="btn btn-primary">Thanh toán tất cả lịch hẹn chưa thanh toán</a>
-    </div>
+            "Pending" => "bg-warning text-dark",
+            "Completed" => "bg-success",
+            "Paid" => "bg-primary",
+            _ => "bg-secondary"
+        };
+    }
 }
-
-<!-- Thêm Flatpickr -->
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
-<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
-<script>
-    document.addEventListener("DOMContentLoaded", function () {
-        flatpickr("#appointmentDate", { dateFormat: "Y-m-d", minDate: "today" });
-        flatpickr("#datepicker", {
-            dateFormat: "Y-m-d",
-            onChange: function(selectedDates, dateStr) {
-                let rows = document.querySelectorAll("#scheduleTable tr");
-                rows.forEach(row => {
-                    let rowDate = row.getAttribute("data-date");
-                    row.style.display = (rowDate === dateStr || dateStr === "") ? "" : "none";
-                });
-            }
-        });
-    });
-</script>

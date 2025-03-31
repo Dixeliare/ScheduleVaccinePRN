@@ -4,41 +4,118 @@
     ViewData["Title"] = "Register";
 }
 
-<h2>Register</h2>
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8 col-lg-6">
+            <div class="card shadow-lg border-0 rounded-lg">
+                <div class="card-header bg-primary text-white text-center">
+                    <h3 class="mb-0"><i class="fas fa-user-plus me-2"></i>Create Account</h3>
+                </div>
+                <div class="card-body p-4">
+                    @if (!string.IsNullOrEmpty(Model.ErrorMessage))
+                    {
+                        <div class="alert alert-danger d-flex align-items-center" role="alert">
+                            <i class="fas fa-exclamation-circle me-2"></i>
+                            <div>@Model.ErrorMessage</div>
+                        </div>
+                    }
 
-@if (!string.IsNullOrEmpty(Model.ErrorMessage))
-{
-    <div class="alert alert-danger">@Model.ErrorMessage</div>
-}
+                    <p class="text-center text-muted mb-4">Please fill in all the information to create a new account</p>
 
-<form method="post">
-    <div class="form-group">
-        <label asp-for="RegisterData.Email"></label>
-        <input asp-for="RegisterData.Email" class="form-control" />
-        <span asp-validation-for="RegisterData.Email" class="text-danger"></span>
+                    <form method="post">
+                        <div class="mb-3">
+                            <label asp-for="RegisterData.Email" class="form-label fw-bold">
+                                <i class="fas fa-envelope me-1"></i> Email Address
+                            </label>
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="fas fa-at"></i></span>
+                                <input asp-for="RegisterData.Email" class="form-control" placeholder="Enter your email address" />
+                            </div>
+                            <span asp-validation-for="RegisterData.Email" class="text-danger small"></span>
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="RegisterData.Username" class="form-label fw-bold">
+                                <i class="fas fa-user me-1"></i> Username
+                            </label>
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="fas fa-id-badge"></i></span>
+                                <input asp-for="RegisterData.Username" class="form-control" placeholder="Choose a username" />
+                            </div>
+                            <span asp-validation-for="RegisterData.Username" class="text-danger small"></span>
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="RegisterData.Password" class="form-label fw-bold">
+                                <i class="fas fa-lock me-1"></i> Password
+                            </label>
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="fas fa-key"></i></span>
+                                <input asp-for="RegisterData.Password" type="password" class="form-control" placeholder="Create a secure password" />
+                                <button class="btn btn-outline-secondary toggle-password" type="button" data-target="RegisterData_Password">
+                                    <i class="fas fa-eye"></i>
+                                </button>
+                            </div>
+                            <span asp-validation-for="RegisterData.Password" class="text-danger small"></span>
+                            <div class="form-text">Password must be at least 6 characters long, including letters and numbers.</div>
+                        </div>
+
+                        <div class="mb-4">
+                            <label asp-for="RegisterData.ConfirmPassword" class="form-label fw-bold">
+                                <i class="fas fa-lock me-1"></i> Confirm Password
+                            </label>
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="fas fa-shield-alt"></i></span>
+                                <input asp-for="RegisterData.ConfirmPassword" type="password" class="form-control" placeholder="Confirm your password" />
+                                <button class="btn btn-outline-secondary toggle-password" type="button" data-target="RegisterData_ConfirmPassword">
+                                    <i class="fas fa-eye"></i>
+                                </button>
+                            </div>
+                            <span asp-validation-for="RegisterData.ConfirmPassword" class="text-danger small"></span>
+                        </div>
+
+                        <div class="form-check mb-4">
+                            <input class="form-check-input" type="checkbox" id="agreeTerms" required>
+                            <label class="form-check-label" for="agreeTerms">
+                                I agree to the <a href="#">Terms of Service</a> and <a href="#">Privacy Policy</a>
+                            </label>
+                        </div>
+
+                        <div class="d-grid">
+                            <button type="submit" class="btn btn-primary btn-lg">
+                                <i class="fas fa-user-plus me-2"></i>Register
+                            </button>
+                        </div>
+                    </form>
+                </div>
+                <div class="card-footer text-center py-3 bg-light">
+                    <div class="small">
+                        <i class="fas fa-question-circle me-1"></i>
+                        Already have an account? <a href="/Accounts/Login">Sign in</a>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
-
-    <div class="form-group">
-        <label asp-for="RegisterData.Username"></label>
-        <input asp-for="RegisterData.Username" class="form-control" />
-        <span asp-validation-for="RegisterData.Username" class="text-danger"></span>
-    </div>
-
-    <div class="form-group">
-        <label asp-for="RegisterData.Password"></label>
-        <input asp-for="RegisterData.Password" type="password" class="form-control" />
-        <span asp-validation-for="RegisterData.Password" class="text-danger"></span>
-    </div>
-
-    <div class="form-group">
-        <label asp-for="RegisterData.ConfirmPassword"></label>
-        <input asp-for="RegisterData.ConfirmPassword" type="password" class="form-control" />
-        <span asp-validation-for="RegisterData.ConfirmPassword" class="text-danger"></span>
-    </div>
-
-    <button type="submit" class="btn btn-primary">Register</button>
-</form>
+</div>
 
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />
+    <script>
+        // Script to show/hide password
+        document.querySelectorAll('.toggle-password').forEach(button => {
+            button.addEventListener('click', function() {
+                const targetId = this.getAttribute('data-target');
+                const passwordInput = document.getElementById(targetId);
+
+                if (passwordInput.type === 'password') {
+                    passwordInput.type = 'text';
+                    this.querySelector('i').classList.replace('fa-eye', 'fa-eye-slash');
+                } else {
+                    passwordInput.type = 'password';
+                    this.querySelector('i').classList.replace('fa-eye-slash', 'fa-eye');
+                }
+            });
+        });
+    </script>
 }

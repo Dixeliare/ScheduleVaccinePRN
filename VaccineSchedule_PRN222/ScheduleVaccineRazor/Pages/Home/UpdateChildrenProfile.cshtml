@@ -1,26 +1,90 @@
 ﻿@page
 @model ScheduleVaccineRazor.Pages.Home.UpdateChildrenProfileModel
 @{
-    ViewData["Title"] = "Update Children Profile";
+    ViewData["Title"] = "Update Child Profile";
 }
 
-<h2>Update Children Profile</h2>
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card shadow-lg">
+                <div class="card-header bg-primary text-white">
+                    <h3 class="card-title mb-0">
+                        <i class="bi bi-person-badge me-2"></i>Update Child Profile
+                    </h3>
+                </div>
 
-<form method="post">
-    <input type="hidden" asp-for="Profile.Id" />
-    <input type="hidden" asp-for="Profile.ParentId" /> <!-- Ẩn ParentId -->
+                <div class="card-body">
+                    <form method="post">
+                        <input type="hidden" asp-for="Profile.Id" />
+                        <input type="hidden" asp-for="Profile.ParentId" />
+                        <input type="hidden" asp-for="Profile.Gender" />
 
-    <div class="form-group">
-        <label for="FullName">Full Name</label>
-        <input asp-for="Profile.FullName" class="form-control" required />
+                        <div class="row g-4">
+                            <!-- Full Name -->
+                            <div class="col-md-6">
+                                <div class="form-floating">
+                                    <input asp-for="Profile.FullName"
+                                           class="form-control"
+                                           placeholder="Full name"
+                                           required />
+                                    <label asp-for="Profile.FullName">
+                                        <i class="bi bi-person-badge me-2"></i>Full Name
+                                    </label>
+                                </div>
+                                <span asp-validation-for="Profile.FullName" class="text-danger small"></span>
+                            </div>
+
+                            <!-- Birth Date -->
+                            <div class="col-md-6">
+                                <div class="form-floating">
+                                    <input asp-for="Profile.BirthDate"
+                                           type="date"
+                                           class="form-control"
+                                           required />
+                                    <label asp-for="Profile.BirthDate">
+                                        <i class="bi bi-calendar-event me-2"></i>Birth Date
+                                    </label>
+                                </div>
+                                <span asp-validation-for="Profile.BirthDate" class="text-danger small"></span>
+                            </div>
+                        </div>
+
+                        <!-- Action Buttons -->
+                        <div class="d-flex gap-3 mt-4 justify-content-end">
+                            <a asp-page="/Home/ChildrenProfile"
+                               class="btn btn-outline-secondary px-4">
+                                <i class="bi bi-arrow-left me-2"></i>Cancel
+                            </a>
+                            <button type="submit"
+                                    class="btn btn-primary px-4">
+                                <i class="bi bi-save me-2"></i>Save Changes
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
     </div>
+</div>
 
-    <div class="form-group">
-        <label for="BirthDate">Birth Date</label>
-        <input asp-for="Profile.BirthDate" type="date" class="form-control" required />
-    </div>
-    <input type="hidden" asp-for="Profile.Gender" />
+<style>
+    .card {
+        border-radius: 1rem;
+        margin-top: 2rem;
+    }
 
-    <button type="submit" class="btn btn-primary mt-2">Save Changes</button>
-    <a asp-page="/Home/ChildrenProfile" class="btn btn-secondary mt-2">Cancel</a>
-</form>
+    .form-floating label {
+        padding-left: 2.5rem;
+    }
+
+    .form-control {
+        border-radius: 0.5rem;
+        padding: 1rem;
+    }
+
+    .btn {
+        border-radius: 0.5rem;
+        min-width: 150px;
+    }
+</style>

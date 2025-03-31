@@ -1,82 +1,138 @@
-﻿@page 
+﻿@page
 @model ScheduleVaccineRazor.Pages.Home.SchedulePaymentModel
-
 @{
-    ViewData["Title"] = "Thanh toán lịch hẹn";
+    ViewData["Title"] = "Payment Management";
 }
 
-<h1>Thanh toán lịch hẹn</h1>
+<div class="container">
+    <div class="card shadow-lg">
+        <div class="card-header bg-primary text-white">
+            <h2 class="card-title mb-0">
+                <i class="bi bi-credit-card me-2"></i>Vaccination Payment
+            </h2>
+        </div>
 
-@if (Model.Schedules != null && Model.Schedules.Any())
-{
-    <div class="card p-3">
-        <h4>Danh sách lịch hẹn</h4>
-        <table class="table">
-            <thead>
-                <tr>
-                    <th>Chọn</th>
-                    <th>Ngày hẹn</th>
-                    <th>Trẻ</th>
-                    <th>Vaccine</th>
-                    <th>Giá</th>
-                </tr>
-            </thead>
-            <tbody>
-                @foreach (var schedule in Model.Schedules)
-                {
-                    <tr>
-                        <td>
-                            <input type="checkbox" class="schedule-checkbox" data-price="@schedule.Vaccine.Price" value="@schedule.Id">
-                        </td>
-                        <td>@schedule.AppointmentDate.ToString("yyyy-MM-dd")</td>
-                        <td>@schedule.Child.FullName</td>
-                        <td>@schedule.Vaccine.Name</td>
-                        <td>@schedule.Vaccine.Price.ToString("C")</td>
-                    </tr>
-                }
-            </tbody>
-        </table>
+        <div class="card-body">
+            @if (Model.Schedules != null && Model.Schedules.Any())
+            {
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead class="table-light">
+                            <tr>
+                                <th class="text-center" style="width: 50px">
+                                    <i class="bi bi-check-circle"></i>
+                                </th>
+                                <th><i class="bi bi-calendar me-2"></i>Date</th>
+                                <th><i class="bi bi-person me-2"></i>Child</th>
+                                <th><i class="bi bi-syringe me-2"></i>Vaccine</th>
+                                <th class="text-end"><i class="bi bi-cash me-2"></i>Price</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var schedule in Model.Schedules)
+                            {
+                                <tr>
+                                    <td class="text-center align-middle">
+                                        <input type="checkbox"
+                                               class="form-check-input schedule-checkbox"
+                                               data-price="@schedule.Vaccine.Price"
+                                               value="@schedule.Id"
+                                               style="width: 1.2em; height: 1.2em">
+                                    </td>
+                                    <td>@schedule.AppointmentDate.ToString("MM/dd/yyyy")</td>
+                                    <td>@schedule.Child.FullName</td>
+                                    <td>@schedule.Vaccine.Name</td>
+                                    <td class="text-end">@schedule.Vaccine.Price.ToString("C")</td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
 
-        <h5>Tổng tiền: <span id="totalPrice">0</span></h5>
+                <div class="card mt-4 border-primary">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <h5 class="mb-0">
+                                <i class="bi bi-wallet2 me-2"></i>Total Amount:
+                            </h5>
+                            <h3 class="mb-0 text-primary" id="totalPrice">$0.00</h3>
+                        </div>
+                    </div>
+                </div>
 
-        <form method="post" id="paymentForm">
-            <input type="hidden" name="SelectedSchedules" id="selectedSchedules">
-            <button type="submit" class="btn btn-primary mt-3">Xác nhận thanh toán</button>
-        </form>
+                <form method="post" id="paymentForm" class="mt-4">
+                    <input type="hidden" name="SelectedSchedules" id="selectedSchedules">
+                    <div class="d-grid gap-2">
+                        <button type="submit" class="btn btn-primary btn-lg">
+                            <i class="bi bi-check-circle me-2"></i>Confirm Payment
+                        </button>
+                    </div>
+                </form>
+            }
+            else
+            {
+                <div class="alert alert-info d-flex align-items-center">
+                    <i class="bi bi-info-circle-fill me-2 fs-4"></i>
+                    <div class="fs-5">No pending payments found!</div>
+                </div>
+            }
+        </div>
     </div>
-}
-else
-{
-    <p class="text-danger">Không có lịch hẹn nào cần thanh toán!</p>
-}
+</div>
+
+<style>
+    .card {
+        border-radius: 1rem;
+        border: none;
+    }
+
+    .table-hover tbody tr:hover {
+        background-color: #f8f9fa;
+    }
+
+    .form-check-input:checked {
+        background-color: #0d6efd;
+        border-color: #0d6efd;
+    }
+
+    .alert {
+        border-radius: 0.75rem;
+    }
+</style>
 
 <script>
     document.addEventListener("DOMContentLoaded", function () {
-        let checkboxes = document.querySelectorAll(".schedule-checkbox");
-        let totalPriceElement = document.getElementById("totalPrice");
-        let selectedSchedulesInput = document.getElementById("selectedSchedules");
+        const checkboxes = document.querySelectorAll(".schedule-checkbox");
+        const totalPriceElement = document.getElementById("totalPrice");
+        const selectedSchedulesInput = document.getElementById("selectedSchedules");
 
-        function updateTotalPrice() {
+        const updateTotalPrice = () => {
             let total = 0;
-            let selectedIds = [];
+            const selectedIds = [];
+
             checkboxes.forEach(checkbox => {
                 if (checkbox.checked) {
-                    total += parseFloat(checkbox.getAttribute("data-price"));
+                    total += parseFloat(checkbox.dataset.price);
                     selectedIds.push(checkbox.value);
                 }
             });
-            totalPriceElement.textContent = total.toLocaleString("vi-VN", { style: "currency", currency: "VND" });
+
+            totalPriceElement.textContent = total.toLocaleString('en-US', {
+                style: 'currency',
+                currency: 'USD'
+            });
+
             selectedSchedulesInput.value = selectedIds.join(",");
-        }
+        };
 
         checkboxes.forEach(checkbox => {
-            checkbox.addEventListener("change", updateTotalPrice);
+            checkbox.addEventListener('change', updateTotalPrice);
         });
 
-        document.getElementById("paymentForm").addEventListener("submit", function (event) {
+        document.getElementById("paymentForm").addEventListener("submit", function (e) {
             if (selectedSchedulesInput.value === "") {
-                event.preventDefault();
-                alert("Vui lòng chọn ít nhất một lịch hẹn để thanh toán!");
+                e.preventDefault();
+                alert("Please select at least one schedule to proceed with payment!");
             }
         });
     });
